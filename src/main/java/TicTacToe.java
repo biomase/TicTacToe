@@ -117,7 +117,7 @@ public class TicTacToe {
             turnHuman();
             printMap();
             if (checkEnd(DOT_HUMAN)) {
-                break
+                break;
             }
 
             turnAI();
@@ -126,5 +126,184 @@ public class TicTacToe {
                 break;
             }
         }
+    }
+
+
+    private static void turnHuman() { // ход человека
+        System.out.println("Ваш ход");
+        int rowNumber, columnNumber;
+
+        while (true) {
+            rowNumber = getValidNumberFromUser() - 1;
+            columnNumber = getValidNumberFromUser() - 1;
+            if (isCellFree(rowNumber, columnNumber)) {
+                break;
+            }
+            System.out.println("\nВы выбрали занятую ячейку!");
+        }
+        curNumRow = rowNumber;
+        curNumCol = columnNumber;
+        MAP[rowNumber][columnNumber] = DOT_HUMAN;
+        counter++;
+    }
+
+    private static int getValidNumberFromUser() {  // Проверка правильно ввода координаты
+        while (true) {
+            System.out.print("Введите координату(1-" + SIZE + "): ");
+            if (in.hasNextInt()) {
+                int n = in.nextInt();
+                if (isNumberValid(n)) {
+
+                    return n;
+                }
+                System.out.println("\nПроверьте значение координаты. Должно быть от 1 до " + SIZE);
+            } else {
+                in.next();
+                System.out.println("\nНеобходимо вводить только целые числа!");
+            }
+        }
+    }
+
+    private static boolean isNumberValid(int n) {  // Проверка числа координаты для опреределенного промежутка
+        return n >= 1 && n <= SIZE;
+    }
+
+    private static boolean isCellFree(int rowNumber, int columnNumber) {  // свободна ли ячейка
+        return MAP[rowNumber][columnNumber] == DOT_EMPTY;
+    }
+
+
+    private static void turnAI() {
+        System.out.println("Ход противника");
+        int rowNumber, columnNumber;
+
+        do {
+            rowNumber = random.nextInt(SIZE);
+            columnNumber = random.nextInt(SIZE);
+
+        } while (!isCellFree(rowNumber, columnNumber));
+
+        MAP[rowNumber][columnNumber] = DOT_AI;
+        counter++;
+    }
+
+    private static boolean checkEnd(char symbol) {
+        if (checkWin(symbol)) {
+            if (symbol == DOT_HUMAN) {
+                System.out.println("\nВы победили!");
+            } else {
+                System.out.println("\nВы проиграли!");
+            }
+            return true;
+        }
+
+        if (checkDraw()) {
+            System.out.println("Ничья!");
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean checkDraw() {  // заполнены ли все клетки
+        return counter >= SIZE * SIZE;
+
+    }
+
+
+    private static boolean checkWin(char symbol) {  // Проверка по ряду, столбцу, главной и второстепенной диагонали
+        return checkRow(symbol) || checkColumn(symbol) || checkRightD(symbol) || checkLeftD(symbol);
+    }
+
+    private static boolean checkRow(char symbol) {
+        turnCount = 0;
+        for (int i = 0; i < SIZE; i++) {
+            if (MAP[curNumRow][i] == symbol) {
+                turnCount++;
+                if (turnCount == sumCount) {
+                    return true;
+                }
+            }
+            else {
+                turnCount = 0;
+            }
+        }
+        return false;
+    }
+
+    public static boolean checkColumn(char symbol) {
+        turnCount = 0;
+        for (int i = 0; i < SIZE; i++) {
+            if (MAP[i][curNumCol] == symbol) {
+                turnCount++;
+                if (turnCount == sumCount) {
+                    return true;
+                }
+            }
+            else {
+                turnCount = 0;
+            }
+        }
+        return false;
+    }
+
+    private static boolean checkRightD(char symbol) {
+        turnCount = 0;
+        int curRow = (curNumRow > curNumCol) ? curNumRow - curNumCol : 0;
+        int curCol = (curNumRow > curNumCol) ? 0 : curNumCol - curNumRow;
+        for (int i = 0; i < SIZE; i++) {
+            int row = curRow + i;
+            int col = curCol + i;
+            if (row <= (SIZE - 1) && col <= (SIZE - 1)) {
+                if (MAP[row][col] == symbol) {
+                    turnCount++;
+                    if (turnCount == sumCount) {
+                        return true;
+                    }
+                }
+                else {
+                    turnCount = 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean checkLeftD(char symbol) {
+        turnCount = 0;
+        int curRow = Math.min((curNumRow + curNumCol), (SIZE - 1));
+        int curCol = (curRow == (SIZE - 1)) ? curNumRow + curNumCol - curRow : 0;
+        for (int i = 0; i < SIZE; i++) {
+            int row = curRow - i;
+            int col = curCol + i;
+            if (row >= 0 && col <= (SIZE - 1)) {
+                if (MAP[row][col] == symbol) {
+                    turnCount++;
+                    if (turnCount == sumCount) {
+                        return true;
+                    }
+                }
+                else {
+                    turnCount = 0;
+                }
+            }
+        }
+        return false;
+    }
+
+
+
+    private static boolean isContinueGame() {
+        System.out.println("Хотите продолжить? да\\нет: ");
+        counter = 0;
+        turnCount = 0;
+        return switch (in.next()) {
+            case "yes", "да" -> true;
+            default -> false;
+        };
+    }
+
+    private static void endGame() {
+        in.close();
+        System.out.println("Игра завершена!");
     }
 }
