@@ -109,4 +109,22 @@ public class TicTacToe {
             System.out.println();
         }
     }
+
+
+    private static void playGame() {  // Основная конструкция
+
+        while (true) {
+            turnHuman();
+            printMap();
+            if (checkEnd(DOT_HUMAN)) {
+                break
+            }
+
+            turnAI();
+            printMap();
+            if (checkEnd(DOT_AI)) {
+                break;
+            }
+        }
+    }
 }
